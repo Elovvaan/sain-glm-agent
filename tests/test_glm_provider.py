@@ -41,3 +41,24 @@ class GLMProviderTests(unittest.TestCase):
             response = provider.generate(request)
         self.assertEqual(response.content, "world")
         self.assertEqual(response.usage["prompt_tokens"], 12)
+
+    def test_generate_sends_bearer_authorization_header(self) -> None:
+        provider = GLMProvider(Settings(api_key="secret"))
+        request = ModelRequest(
+            model="glm-5.2",
+            system_prompt="system",
+            messages=[Message(role="user", content="hello")],
+        )
+        payload = {"choices": [{"message": {"content": "world"}}]}
+        captured_request = None
+
+        def fake_urlopen(http_request, timeout):
+            del timeout
+            nonlocal captured_request
+            captured_request = http_request
+            return FakeHTTPResponse(payload)
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            provider.generate(request)
+        assert captured_request is not None
+        self.assertEqual(captured_request.headers["Authorization"], "******")
