@@ -61,4 +61,4 @@ class GLMProviderTests(unittest.TestCase):
         with patch("urllib.request.urlopen", side_effect=fake_urlopen):
             provider.generate(request)
         assert captured_request is not None
-        self.assertEqual(captured_request.headers["Authorization"], "******")
+        self.assertEqual(captured_request.headers["Authorization"], "Bearer " + "secret")

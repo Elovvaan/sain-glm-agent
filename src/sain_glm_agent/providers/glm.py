@@ -34,7 +34,7 @@ class GLMProvider(ModelProvider):
             url=self._endpoint(),
             data=encoded,
             headers={
-                "Authorization": f"******",
+                "Authorization": "Bearer " + self.settings.api_key,
                 "Content-Type": "application/json",
             },
             method="POST",
